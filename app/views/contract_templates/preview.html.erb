@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= @template.name %> - Preview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .placeholder {
+      background-color: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div style="background-color: #f0f4f8; padding: 10px 20px; margin-bottom: 20px; border-radius: 8px;">
+    <p style="margin: 0; color: #666; font-size: 14px;">
+      <strong>Preview do Template:</strong> <%= @template.name %>
+    </p>
+    <p style="margin: 5px 0 0; color: #888; font-size: 12px;">
+      Os campos destacados em amarelo são variáveis que serão preenchidas no contrato.
+    </p>
+  </div>
+  
+  <%= raw @template.content_html.gsub(/\{\{(\w+)\}\}/, '<span class="placeholder">{{\1}}</span>') %>
+</body>
+</html>

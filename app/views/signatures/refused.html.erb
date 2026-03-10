@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contrato Recusado - Let's Go Far</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-red-50 min-h-screen flex items-center justify-center">
+  <div class="max-w-lg mx-auto text-center px-4">
+    <div class="bg-white shadow-lg rounded-lg p-8">
+      <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <span class="text-4xl">❌</span>
+      </div>
+      
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">Contrato Recusado</h1>
+      
+      <p class="text-gray-600 mb-6">
+        Você optou por não assinar o contrato "<%= @contract.title %>".
+      </p>
+
+      <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+        <p class="text-sm text-gray-600 mb-2"><strong>Detalhes:</strong></p>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>📄 Contrato: <%= @contract.contract_number %></li>
+          <li>📅 Recusado em: <%= @signer.refused_at.strftime('%d/%m/%Y às %H:%M') %></li>
+          <% if @signer.refusal_reason.present? %>
+            <li>💬 Motivo: <%= @signer.refusal_reason %></li>
+          <% end %>
+        </ul>
+      </div>
+
+      <p class="text-sm text-gray-500">
+        O responsável pelo contrato foi notificado sobre sua decisão.
+        Se tiver dúvidas, entre em contato diretamente.
+      </p>
+    </div>
+
+    <div class="mt-8 text-sm text-gray-500">
+      <p>Let's Go Far Ensino de Idiomas LTDA</p>
+    </div>
+  </div>
+</body>
+</html>

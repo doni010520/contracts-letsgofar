@@ -1,0 +1,82 @@
+<% content_for(:title) { 'Contratos' } %>
+
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Contratos</h1>
+  <%= link_to 'Novo Contrato', new_contract_path, class: 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium' %>
+</div>
+
+<!-- Filtros -->
+<div class="bg-white rounded-lg shadow mb-6 p-4">
+  <div class="flex space-x-2">
+    <%= link_to 'Todos', contracts_path, class: "px-3 py-1 rounded-md text-sm #{params[:status].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    <%= link_to 'Rascunhos', contracts_path(status: 'draft'), class: "px-3 py-1 rounded-md text-sm #{params[:status] == 'draft' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    <%= link_to 'Pendentes', contracts_path(status: 'pending'), class: "px-3 py-1 rounded-md text-sm #{params[:status] == 'pending' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    <%= link_to 'Assinados', contracts_path(status: 'signed'), class: "px-3 py-1 rounded-md text-sm #{params[:status] == 'signed' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  </div>
+</div>
+
+<!-- Lista -->
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <% if @contracts.any? %>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contrato</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contratante</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Signatários</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @contracts.each do |contract| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="text-sm font-medium text-gray-900"><%= contract.title %></div>
+              <div class="text-sm text-gray-500"><%= contract.contract_number %></div>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              <%= contract.contractor_name || '-' %>
+            </td>
+            <td class="px-6 py-4">
+              <% 
+                color_classes = {
+                  'draft' => 'bg-gray-100 text-gray-800',
+                  'pending' => 'bg-yellow-100 text-yellow-800',
+                  'partially_signed' => 'bg-blue-100 text-blue-800',
+                  'signed' => 'bg-green-100 text-green-800',
+                  'refused' => 'bg-red-100 text-red-800',
+                  'expired' => 'bg-orange-100 text-orange-800',
+                  'cancelled' => 'bg-gray-100 text-gray-800'
+                }
+              %>
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= color_classes[contract.status] %>">
+                <%= contract.status_label %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              <% signed = contract.contract_signers.signed.count %>
+              <% total = contract.contract_signers.count %>
+              <%= signed %>/<%= total %> assinado(s)
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-500">
+              <%= contract.created_at.strftime('%d/%m/%Y') %>
+            </td>
+            <td class="px-6 py-4 text-right text-sm font-medium space-x-2">
+              <%= link_to 'Ver', contract_path(contract), class: 'text-blue-600 hover:text-blue-900' %>
+              <% if contract.status == 'draft' %>
+                <%= link_to 'Editar', edit_contract_path(contract), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="text-center py-12">
+      <p class="text-gray-500 mb-4">Nenhum contrato encontrado.</p>
+      <%= link_to 'Criar primeiro contrato', new_contract_path, class: 'text-blue-600 hover:text-blue-900 font-medium' %>
+    </div>
+  <% end %>
+</div>
