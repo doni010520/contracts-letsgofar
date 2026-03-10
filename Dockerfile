@@ -15,7 +15,7 @@ RUN apt-get update -qq && \
 WORKDIR /app
 
 # Copiar Gemfile
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile ./
 RUN bundle install --without development test
 
 # Copiar aplicação
