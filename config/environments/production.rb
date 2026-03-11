@@ -13,7 +13,7 @@ Rails.application.configure do
 
   config.force_ssl = ENV['FORCE_SSL'] == 'true'
 
-  config.logger = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.logger = ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
   config.log_tags = [:request_id]
   config.log_level = ENV.fetch('RAILS_LOG_LEVEL', 'info')
 
