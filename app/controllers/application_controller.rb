@@ -8,18 +8,15 @@ class ApplicationController < ActionController::Base
   private
 
   def current_user
-    @current_user ||= User.find_by(id: session[:user_id]) if session[:user_id]
+    @current_user ||= User.first
   end
 
   def logged_in?
-    current_user.present?
+    true
   end
 
   def require_login
-    unless logged_in?
-      flash[:alert] = 'Você precisa fazer login para acessar esta página.'
-      redirect_to login_path
-    end
+    # Autenticação desabilitada
   end
 
   def client_ip
