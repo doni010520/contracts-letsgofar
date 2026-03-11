@@ -67,6 +67,7 @@
               <%= link_to 'Ver', contract_path(contract), class: 'text-blue-600 hover:text-blue-900' %>
               <% if contract.status == 'draft' %>
                 <%= link_to 'Editar', edit_contract_path(contract), class: 'text-indigo-600 hover:text-indigo-900' %>
+                <%= button_to 'Excluir', contract_path(contract), method: :delete, class: 'text-red-600 hover:text-red-900', data: { confirm: 'Tem certeza que deseja excluir este contrato?' } %>
               <% end %>
             </td>
           </tr>
