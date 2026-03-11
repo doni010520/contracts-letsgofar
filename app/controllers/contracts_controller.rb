@@ -2,7 +2,7 @@
 
 class ContractsController < ApplicationController
   before_action :require_login
-  before_action :set_contract, only: %i[show edit update destroy send_for_signature cancel duplicate preview download_pdf]
+  before_action :set_contract, only: %i[show edit update destroy send_for_signature cancel duplicate preview download_pdf edit_content update_content]
 
   def index
     @contracts = current_user.contracts.includes(:contract_signers).order(created_at: :desc)
@@ -116,6 +116,29 @@ class ContractsController < ApplicationController
   def download_pdf
     # Por enquanto, renderiza HTML para impressão
     render :preview, layout: 'pdf'
+  end
+
+  def edit_content
+    unless @contract.status == 'draft'
+      flash[:alert] = 'Não é possível editar um contrato já enviado.'
+      redirect_to contract_path(@contract)
+    end
+  end
+
+  def update_content
+    if @contract.status != 'draft'
+      flash[:alert] = 'Não é possível editar um contrato já enviado.'
+      redirect_to contract_path(@contract)
+      return
+    end
+
+    if @contract.update(content_html: params[:contract][:content_html])
+      @contract.log_activity!('content_edited', user: current_user, ip_address: client_ip)
+      flash[:notice] = 'Conteúdo do contrato atualizado com sucesso!'
+      redirect_to contract_path(@contract)
+    else
+      render :edit_content, status: :unprocessable_entity
+    end
   end
 
   private
