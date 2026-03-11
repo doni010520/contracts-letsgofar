@@ -25,7 +25,7 @@ COPY . .
 RUN SECRET_KEY_BASE=dummy bundle exec rails assets:precompile
 
 # Expor porta
-EXPOSE 3000
+EXPOSE 3050
 
 # Comando padrão
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
