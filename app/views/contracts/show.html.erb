@@ -33,7 +33,8 @@
       <!-- Ações -->
       <div class="mt-6 flex flex-wrap gap-2">
         <% if @contract.status == 'draft' %>
-          <%= link_to 'Editar', edit_contract_path(@contract), class: 'bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
+          <%= link_to 'Editar Dados', edit_contract_path(@contract), class: 'bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
+          <%= link_to 'Editar Conteúdo', edit_content_contract_path(@contract), class: 'bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
         <% end %>
         
         <% if @contract.can_send? %>
