@@ -1,0 +1,72 @@
+<% content_for(:title) { "Editar Conteúdo: #{@contract.title}" } %>
+
+<div class="mb-6">
+  <%= link_to '← Voltar', contract_path(@contract), class: 'text-blue-600 hover:text-blue-900' %>
+</div>
+
+<div class="bg-white shadow rounded-lg p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Editar Conteúdo do Contrato</h1>
+    <span class="text-sm text-gray-500"><%= @contract.contract_number %></span>
+  </div>
+
+  <%= form_with model: @contract, url: update_content_contract_path(@contract), method: :patch, local: true do |f| %>
+    <div class="mb-6">
+      <%= f.text_area :content_html, id: 'contract_editor', class: 'hidden' %>
+    </div>
+
+    <div class="flex space-x-4">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium">
+        Salvar Alterações
+      </button>
+      <%= link_to 'Cancelar', contract_path(@contract), class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md font-medium' %>
+      <%= link_to 'Visualizar', preview_contract_path(@contract), target: '_blank', class: 'bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-md font-medium' %>
+    </div>
+  <% end %>
+</div>
+
+<!-- TinyMCE CDN -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  tinymce.init({
+    selector: '#contract_editor',
+    height: 700,
+    language: 'pt_BR',
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'pagebreak'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+      'bold italic underline strikethrough | forecolor backcolor | ' +
+      'alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist outdent indent | ' +
+      'table | pagebreak | removeformat | code fullscreen | help',
+    menubar: 'file edit view insert format tools table help',
+    content_style: `
+      body { 
+        font-family: Arial, sans-serif; 
+        font-size: 14px; 
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      h1 { font-size: 24px; margin-bottom: 20px; }
+      h2 { font-size: 20px; margin-top: 30px; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px; }
+      h3 { font-size: 16px; margin-top: 25px; }
+      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+      td, th { border: 1px solid #ddd; padding: 8px; }
+      p { text-align: justify; margin-bottom: 10px; }
+    `,
+    pagebreak_separator: '<div style="page-break-before: always; margin-top: 60px; border-top: 3px solid #333; padding-top: 30px;"></div>',
+    setup: function(editor) {
+      editor.on('change', function() {
+        editor.save(); // Sincroniza com o textarea
+      });
+    }
+  });
+});
+</script>
