@@ -1,201 +1,75 @@
-<% content_for(:title) { "Editar: #{@contract.title}" } %>
+<% content_for(:title) { 'Contratos' } %>
 
-<div class="mb-6">
-  <%= link_to '← Voltar', contract_path(@contract), class: 'text-blue-600 hover:text-blue-900' %>
+<div class="flex justify-between items-center mb-6">
+  <h1 class="text-2xl font-bold text-gray-900">Contratos</h1>
+  <%= link_to 'Novo Contrato', new_contract_path, class: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-  <!-- Coluna principal -->
-  <div class="lg:col-span-2 space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Editar Contrato</h1>
-
-      <%= form_with model: @contract, local: true, class: 'space-y-6' do |f| %>
-        <% if @contract.errors.any? %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <ul class="list-disc list-inside">
-              <% @contract.errors.full_messages.each do |msg| %>
-                <li><%= msg %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <div>
-          <label for="contract_title" class="block text-sm font-medium text-gray-700 mb-2">Título *</label>
-          <%= f.text_field :title, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', required: true %>
-        </div>
-
-        <% if @contract.contract_template.present? %>
-          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 class="font-medium text-blue-900 mb-4">Preencher Variáveis</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <% (@contract.contract_template.variable_fields || []).each do |field| %>
-                <% 
-                  field_key = field['key'] || field[:key]
-                  field_label = field['label'] || field[:label]
-                  field_type = field['type'] || field[:type]
-                  field_required = field['required'] || field[:required]
-                  current_value = @contract.variables&.dig(field_key) || ''
-                %>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
-                    <%= field_label %>
-                    <% if field_required %><span class="text-red-500">*</span><% end %>
-                  </label>
-                  <% case field_type %>
-                  <% when 'select', 'state' %>
-                    <select name="contract[variables][<%= field_key %>]" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
-                      <option value="">Selecione...</option>
-                      <% %w[AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO].each do |uf| %>
-                        <option value="<%= uf %>" <%= 'selected' if current_value == uf %>><%= uf %></option>
-                      <% end %>
-                    </select>
-                  <% else %>
-                    <% 
-                      data_mask = case field_type
-                        when 'cpf' then '000.000.000-00'
-                        when 'phone' then '(00) 00000-0000'
-                        when 'cep' then '00000-000'
-                        when 'currency' then nil
-                        when 'date' then '00/00/0000'
-                        else nil
-                      end
-                      input_class = "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      input_class += " mask-currency" if field_type == 'currency'
-                    %>
-                    <input type="text" 
-                           name="contract[variables][<%= field_key %>]" 
-                           value="<%= current_value %>"
-                           class="<%= input_class %>"
-                           <% if data_mask %>data-mask="<%= data_mask %>"<% end %>
-                           <% if field_type == 'currency' %>data-type="currency"<% end %>
-                           <%= 'required' if field_required %>>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% else %>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Conteúdo HTML</label>
-            <%= f.text_area :content_html, rows: 20, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm font-mono text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500' %>
-          </div>
-        <% end %>
-
-        <div class="flex space-x-4">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium">
-            Salvar Alterações
-          </button>
-          <%= link_to 'Cancelar', contract_path(@contract), class: 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-md font-medium' %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Coluna lateral - Signatários -->
-  <div class="space-y-6">
-    <div class="bg-white shadow rounded-lg p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Signatários</h2>
-      
-      <% if @contract.contract_signers.any? %>
-        <div class="space-y-3 mb-4">
-          <% @contract.contract_signers.by_order.each do |signer| %>
-            <div class="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <p class="font-medium text-sm"><%= signer.name %></p>
-                <p class="text-xs text-gray-500"><%= signer.email %></p>
-              </div>
-              <%= button_to '×', contract_signer_path(@contract, signer), method: :delete, class: 'text-red-600 hover:text-red-900 font-bold', data: { confirm: 'Remover signatário?' } %>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
-      <!-- Formulário para adicionar -->
-      <div class="border-t pt-4">
-        <h3 class="text-sm font-medium text-gray-700 mb-3">Adicionar Signatário</h3>
-        <%= form_with model: ContractSigner.new, url: contract_signers_path(@contract), local: true, class: 'space-y-3' do |f| %>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">Nome *</label>
-            <%= f.text_field :name, required: true, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm' %>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">Email *</label>
-            <%= f.email_field :email, required: true, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm' %>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">CPF</label>
-            <%= f.text_field :cpf, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm' %>
-          </div>
-          <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-            Adicionar
-          </button>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Dica -->
-    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-      <h3 class="font-medium text-yellow-900 mb-2">💡 Dica</h3>
-      <p class="text-sm text-yellow-800">
-        Adicione pelo menos um signatário antes de enviar o contrato para assinatura.
-      </p>
-    </div>
-  </div>
+<!-- Filtros -->
+<div class="mb-6 flex gap-2">
+  <%= link_to 'Todos', contracts_path, class: "px-4 py-2 rounded #{params[:status].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Rascunhos', contracts_path(status: 'draft'), class: "px-4 py-2 rounded #{params[:status] == 'draft' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Pendentes', contracts_path(status: 'pending'), class: "px-4 py-2 rounded #{params[:status] == 'pending' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Assinados', contracts_path(status: 'signed'), class: "px-4 py-2 rounded #{params[:status] == 'signed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Cancelados', contracts_path(status: 'cancelled'), class: "px-4 py-2 rounded #{params[:status] == 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Máscaras simples (CPF, telefone, CEP, data)
-  document.querySelectorAll('[data-mask]').forEach(function(input) {
-    const mask = input.getAttribute('data-mask');
-    
-    input.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      let result = '';
-      let maskIndex = 0;
-      
-      for (let i = 0; i < value.length && maskIndex < mask.length; i++) {
-        while (maskIndex < mask.length && mask[maskIndex] !== '0') {
-          result += mask[maskIndex];
-          maskIndex++;
-        }
-        if (maskIndex < mask.length) {
-          result += value[i];
-          maskIndex++;
-        }
-      }
-      
-      e.target.value = result;
-    });
-  });
-  
-  // Máscara de moeda (R$ 1.234,56)
-  document.querySelectorAll('[data-type="currency"]').forEach(function(input) {
-    input.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value === '') {
-        e.target.value = '';
-        return;
-      }
-      
-      value = (parseInt(value) / 100).toFixed(2);
-      value = value.replace('.', ',');
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      e.target.value = 'R$ ' + value;
-    });
-    
-    // Formatar valor inicial se existir
-    if (input.value && !input.value.startsWith('R$')) {
-      let value = input.value.replace(/\D/g, '');
-      if (value) {
-        value = (parseInt(value) / 100).toFixed(2);
-        value = value.replace('.', ',');
-        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        input.value = 'R$ ' + value;
-      }
-    }
-  });
-});
-</script>
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contratante</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criado em</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% @contracts.each do |contract| %>
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <%= link_to contract.title, contract_path(contract), class: 'text-blue-600 hover:text-blue-900' %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <%= contract.variables&.dig('contractor_name') || '-' %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <% status_classes = {
+              'draft' => 'bg-yellow-100 text-yellow-800',
+              'pending' => 'bg-orange-100 text-orange-800',
+              'signed' => 'bg-green-100 text-green-800',
+              'cancelled' => 'bg-red-100 text-red-800'
+            } %>
+            <% status_labels = {
+              'draft' => 'Rascunho',
+              'pending' => 'Pendente',
+              'signed' => 'Assinado',
+              'cancelled' => 'Cancelado'
+            } %>
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_classes[contract.status] %>">
+              <%= status_labels[contract.status] %>
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <%= contract.created_at.strftime('%d/%m/%Y %H:%M') %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+            <%= link_to 'Ver', contract_path(contract), class: 'text-blue-600 hover:text-blue-900' %>
+            <% if contract.status == 'draft' %>
+              <%= link_to 'Editar', edit_contract_path(contract), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <%= button_to 'Excluir', contract_path(contract), method: :delete, class: 'text-red-600 hover:text-red-900 bg-transparent border-0 p-0 cursor-pointer', data: { turbo_confirm: 'Tem certeza que deseja excluir este contrato?' } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+      <% if @contracts.empty? %>
+        <tr>
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+            Nenhum contrato encontrado.
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
