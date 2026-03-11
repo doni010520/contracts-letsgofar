@@ -11,7 +11,7 @@ template_content = <<~HTML
     <img src="https://letsgofaridiomas.com/wp-content/uploads/2024/01/logo-lets-go-far.png" alt="Let's Go Far" style="max-width: 150px;" onerror="this.style.display='none'">
   </div>
 
-  <h1 style="text-align: center; color: #8B0000; font-size: 24px; margin-bottom: 30px;">
+  <h1 style="text-align: center; color: #333333; font-size: 24px; margin-bottom: 30px;">
     CONTRATO DE PRESTAÇÃO DE SERVIÇOS
   </h1>
 
@@ -20,7 +20,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CONTRATANTE -->
-  <h3 style="color: #8B0000; margin-top: 25px;">CONTRATANTE ("ALUNO" | "MENTORADO")</h3>
+  <h3 style="color: #333333; margin-top: 25px;">CONTRATANTE ("ALUNO" | "MENTORADO")</h3>
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
     <tr><td style="padding: 8px; border: 1px solid #ddd; width: 200px;"><strong>Nome do aluno:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{{contractor_name}}</td></tr>
     <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>CPF/MF do aluno:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">{{contractor_cpf}}</td></tr>
@@ -36,14 +36,14 @@ template_content = <<~HTML
   </table>
 
   <!-- CONTRATADA -->
-  <h3 style="color: #8B0000; margin-top: 25px;">CONTRATADA ("ESCOLA" | "MENTORA")</h3>
+  <h3 style="color: #333333; margin-top: 25px;">CONTRATADA ("ESCOLA" | "MENTORA")</h3>
   <p style="text-align: justify;">
     <strong>LETS GO FAR ENSINO DE IDIOMAS LTDA</strong> (LET'S GO FAR), inscrita no CNPJ nº 53.654.906/0001-96, 
     com sede na Rua Ipacaetá, 159, sala 04, Guarulhos/SP, CEP 07171-150 no Estado São Paulo, 
     telefone (11) 99777-3116, e-mail contato@letsgofaridiomas.com.
   </p>
 
-  <h3 style="color: #8B0000; margin-top: 25px;">SERVIÇO</h3>
+  <h3 style="color: #333333; margin-top: 25px;">SERVIÇO</h3>
   <p><strong>Assessoria consultiva de inglês</strong></p>
 
   <p style="text-align: justify; margin-top: 20px;">
@@ -57,7 +57,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 1 - OBJETO -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">1. OBJETO DO CONTRATO</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">1. OBJETO DO CONTRATO</h2>
   
   <p style="text-align: justify;">
     <strong>1.1.</strong> O objeto deste contrato consiste na prestação de serviços de assessoria consultiva de inglês, 
@@ -91,7 +91,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 2 - OBRIGAÇÕES DA CONTRATADA -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">2. OBRIGAÇÕES DA CONTRATADA</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">2. OBRIGAÇÕES DA CONTRATADA</h2>
   
   <p style="text-align: justify;">
     <strong>2.1</strong> A CONTRATADA compromete-se a buscar, de forma contínua, melhorias nos processos e serviços 
@@ -177,7 +177,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 3 - OBRIGAÇÕES DO CONTRATANTE -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">3. OBRIGAÇÕES DO CONTRATANTE</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">3. OBRIGAÇÕES DO CONTRATANTE</h2>
   
   <p style="text-align: justify;">
     <strong>3.1</strong> O CONTRATANTE é responsável por garantir o acesso à internet e a um dispositivo compatível 
@@ -288,7 +288,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 4 - VALORES E TAXAS -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">4. VALORES E TAXAS</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">4. VALORES E TAXAS</h2>
   
   <p style="text-align: justify;">
     <strong>4.1</strong> Os valores dos serviços prestados deverão ser pagos pelo CONTRATANTE conforme o valor e 
@@ -323,7 +323,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 5 - PRAZO DE VIGÊNCIA -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">5. PRAZO DE VIGÊNCIA</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">5. PRAZO DE VIGÊNCIA</h2>
   
   <p style="text-align: justify;">
     <strong>5.1.</strong> O presente contrato terá vigência conforme cronograma de aulas e pacote de aulas 
@@ -331,7 +331,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 6 - RESCISÃO CONTRATUAL -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">6. RESCISÃO CONTRATUAL</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">6. RESCISÃO CONTRATUAL</h2>
   
   <p style="text-align: justify;">
     <strong>6.1</strong> Em conformidade com o artigo 49 do Código de Defesa do Consumidor, o CONTRATANTE tem o 
@@ -368,7 +368,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 7 - DIREITO DE IMAGEM -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">7. DIREITO DE IMAGEM E AUTORIZAÇÃO PARA GRAVAÇÃO E USO DE AULAS</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">7. DIREITO DE IMAGEM E AUTORIZAÇÃO PARA GRAVAÇÃO E USO DE AULAS</h2>
   
   <p style="text-align: justify;">
     <strong>7.1.</strong> O CONTRATANTE declara estar ciente e autoriza a gravação de todas as aulas realizadas 
@@ -417,7 +417,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 8 - PROTEÇÃO DE DADOS -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">8. PROTEÇÃO DE DADOS</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">8. PROTEÇÃO DE DADOS</h2>
   
   <p style="text-align: justify;">
     <strong>8.1.</strong> A CONTRATADA compromete-se a tratar os dados pessoais do CONTRATANTE exclusivamente 
@@ -487,7 +487,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 9 - CASO FORTUITO OU FORÇA MAIOR -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">9. CASO FORTUITO OU FORÇA MAIOR</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">9. CASO FORTUITO OU FORÇA MAIOR</h2>
   
   <p style="text-align: justify;">
     <strong>9.1</strong> Nenhuma das partes será responsabilizada pelo não cumprimento ou pelo cumprimento 
@@ -515,7 +515,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 10 - COMUNICAÇÃO -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">10. COMUNICAÇÃO</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">10. COMUNICAÇÃO</h2>
   
   <p style="text-align: justify;">
     <strong>10.1.</strong> Todas as comunicações entre as partes relacionadas à execução deste contrato deverão ser 
@@ -539,7 +539,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 11 - RESOLUÇÃO DE CONFLITO E FORO -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">11. RESOLUÇÃO DE CONFLITO E FORO</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">11. RESOLUÇÃO DE CONFLITO E FORO</h2>
   
   <p style="text-align: justify;">
     <strong>11.1.</strong> As partes comprometem-se a resolver de forma amigável qualquer divergência relativa a este 
@@ -547,7 +547,7 @@ template_content = <<~HTML
   </p>
 
   <!-- CLÁUSULA 12 - ASSINATURA DIGITAL -->
-  <h2 style="color: #8B0000; margin-top: 30px; border-bottom: 2px solid #8B0000; padding-bottom: 5px;">12. ASSINATURA DIGITAL</h2>
+  <h2 style="color: #333333; margin-top: 30px; border-bottom: 2px solid #333333; padding-bottom: 5px;">12. ASSINATURA DIGITAL</h2>
   
   <p style="text-align: justify;">
     <strong>12.1</strong> As partes, por estarem justas e acordadas, assinam este contrato de prestação de serviços de 
@@ -571,8 +571,8 @@ template_content = <<~HTML
   </p>
 
   <!-- ANEXO I -->
-  <div style="page-break-before: always; margin-top: 60px; border-top: 3px solid #8B0000; padding-top: 30px;">
-    <h2 style="text-align: center; color: #8B0000;">ANEXO I</h2>
+  <div style="page-break-before: always; margin-top: 60px; border-top: 3px solid #333333; padding-top: 30px;">
+    <h2 style="text-align: center; color: #333333;">ANEXO I</h2>
     
     <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
       <tr>
@@ -621,7 +621,7 @@ template_content = <<~HTML
       </tr>
     </table>
 
-    <h3 style="color: #8B0000; margin-top: 30px;">Descrição do Plano - Assessoria Consultiva</h3>
+    <h3 style="color: #333333; margin-top: 30px;">Descrição do Plano - Assessoria Consultiva</h3>
     
     <p style="text-align: justify;">
       É um programa intensivo e personalizado, onde trabalhamos juntos para acelerar o seu 
