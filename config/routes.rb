@@ -15,6 +15,8 @@ Rails.application.routes.draw do
       post :duplicate
       get :preview
       get :download_pdf
+      get :edit_content
+      patch :update_content
     end
     
     resources :signers, only: [:create, :destroy] do
