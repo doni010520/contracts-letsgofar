@@ -54,7 +54,7 @@ class ContractSigner < ApplicationRecord
       contract.update_signature_status!
       
       # Enviar confirmação
-      ContractMailer.signature_confirmation(self).deliver_later
+      ContractMailer.signature_confirmation(self).deliver_now
     end
 
     true
@@ -82,7 +82,7 @@ class ContractSigner < ApplicationRecord
     contract.update_signature_status!
     
     # Notificar criador do contrato
-    ContractMailer.signature_refused(self).deliver_later
+    ContractMailer.signature_refused(self).deliver_now
 
     true
   end
