@@ -148,6 +148,6 @@ class ContractsController < ApplicationController
   end
 
   def contract_params
-    params.require(:contract).permit(:title, :content_html, :expires_at)
+    params.require(:contract).permit(:title, :content_html, :expires_at, :plan_start_date, :plan_end_date)
   end
 end
