@@ -40,7 +40,7 @@ Rails.application.routes.draw do
     post ':token', to: 'signatures#create'
     get ':token/success', to: 'signatures#success', as: :sign_success
     get ':token/refused', to: 'signatures#refused', as: :sign_refused
-    post ':token/refuse', to: 'signatures#refuse'
+    post ':token/refuse', to: 'signatures#refuse', as: :refuse_contract
   end
   
   # Health check
