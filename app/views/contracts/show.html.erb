@@ -72,7 +72,7 @@
                   <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pendente</span>
                   <% if @contract.status == 'pending' %>
                     <div class="mt-2">
-                      <%= button_to 'Reenviar Email', resend_email_contract_signer_path(@contract, signer), method: :post, class: 'text-xs text-blue-600 hover:text-blue-900' %>
+                      <%= button_to 'Reenviar Email', resend_email_contract_signer_path(@contract, signer), method: :post, form: { style: 'display: inline;' }, class: 'text-sm text-blue-600 hover:text-blue-900 hover:underline cursor-pointer bg-transparent border-none p-0' %>
                     </div>
                   <% end %>
                 <% when 'signed' %>
