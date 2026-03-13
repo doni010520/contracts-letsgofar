@@ -12,6 +12,7 @@ class Contract < ApplicationRecord
 
   before_validation :generate_contract_number, on: :create
   before_save :generate_document_hash, if: :content_html_changed?
+  before_save :extract_plan_dates_from_variables
 
   scope :draft, -> { where(status: 'draft') }
   scope :pending, -> { where(status: 'pending') }
@@ -20,6 +21,13 @@ class Contract < ApplicationRecord
   scope :refused, -> { where(status: 'refused') }
   scope :expired, -> { where(status: 'expired') }
   scope :cancelled, -> { where(status: 'cancelled') }
+  
+  # Scopes para controle de renovação
+  scope :expiring_this_month, -> { where(plan_end_date: Date.current.beginning_of_month..Date.current.end_of_month) }
+  scope :expiring_next_month, -> { where(plan_end_date: Date.current.next_month.beginning_of_month..Date.current.next_month.end_of_month) }
+  scope :expiring_in_days, ->(days) { where(plan_end_date: Date.current..(Date.current + days.days)) }
+  scope :expired_plans, -> { where('plan_end_date < ?', Date.current) }
+  scope :active_plans, -> { where('plan_end_date >= ?', Date.current) }
 
   # Status possíveis
   STATUSES = %w[draft pending partially_signed signed refused expired cancelled].freeze
@@ -157,5 +165,57 @@ class Contract < ApplicationRecord
 
   def generate_document_hash
     self.document_hash = Digest::SHA256.hexdigest("#{contract_number}|#{content_html}|#{Time.current.to_i}")
+  end
+
+  def extract_plan_dates_from_variables
+    return unless variables.present?
+    
+    # Extrair data de início
+    if variables['plan_start_date'].present?
+      self.plan_start_date = Date.parse(variables['plan_start_date']) rescue nil
+    end
+    
+    # Calcular data de término automaticamente baseado no início + duração
+    if plan_start_date.present? && variables['plan_duration'].present?
+      calculated_end = calculate_end_date(plan_start_date, variables['plan_duration'])
+      if calculated_end.present?
+        self.plan_end_date = calculated_end
+        formatted_date = calculated_end.strftime('%d/%m/%Y')
+        
+        # Atualiza a variável para aparecer no contrato
+        self.variables = variables.merge('plan_end_date' => formatted_date)
+        
+        # Substitui no HTML se ainda não foi substituído
+        if content_html.present? && content_html.include?('{{plan_end_date}}')
+          self.content_html = content_html.gsub('{{plan_end_date}}', formatted_date)
+        end
+      end
+    elsif variables['plan_end_date'].present?
+      # Fallback: usar data de término informada manualmente
+      self.plan_end_date = Date.parse(variables['plan_end_date']) rescue nil
+    end
+  end
+
+  def calculate_end_date(start_date, duration_text)
+    # Extrai número e unidade da duração (ex: "6 meses", "12 meses", "1 ano")
+    duration_text = duration_text.to_s.downcase.strip
+    
+    if duration_text =~ /(\d+)\s*(mes|mês|meses)/i
+      months = $1.to_i
+      start_date + months.months
+    elsif duration_text =~ /(\d+)\s*(ano|anos)/i
+      years = $1.to_i
+      start_date + years.years
+    elsif duration_text =~ /(\d+)\s*(semana|semanas)/i
+      weeks = $1.to_i
+      start_date + weeks.weeks
+    else
+      # Tenta extrair apenas o número e assume meses
+      if duration_text =~ /(\d+)/
+        start_date + $1.to_i.months
+      else
+        nil
+      end
+    end
   end
 end
