@@ -51,6 +51,29 @@
                         <option value="<%= uf %>" <%= 'selected' if current_value == uf %>><%= uf %></option>
                       <% end %>
                     </select>
+                  <% when 'date' %>
+                    <% 
+                      # Converter de DD/MM/YYYY para YYYY-MM-DD (formato do input date)
+                      date_value = ''
+                      if current_value.present?
+                        begin
+                          if current_value.include?('/')
+                            parts = current_value.split('/')
+                            date_value = "#{parts[2]}-#{parts[1]}-#{parts[0]}" if parts.length == 3
+                          else
+                            date_value = current_value
+                          end
+                        rescue
+                          date_value = current_value
+                        end
+                      end
+                    %>
+                    <input type="date" 
+                           name="contract[variables][<%= field_key %>]" 
+                           value="<%= date_value %>"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                           data-date-field="true"
+                           <%= 'required' if field_required %>>
                   <% else %>
                     <% 
                       data_mask = case field_type
@@ -58,7 +81,6 @@
                         when 'phone' then '(00) 00000-0000'
                         when 'cep' then '00000-000'
                         when 'currency' then nil
-                        when 'date' then '00/00/0000'
                         else nil
                       end
                       input_class = "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -147,7 +169,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Máscaras simples (CPF, telefone, CEP, data)
+  // Máscaras simples (CPF, telefone, CEP)
   document.querySelectorAll('[data-mask]').forEach(function(input) {
     const mask = input.getAttribute('data-mask');
     
@@ -196,6 +218,25 @@ document.addEventListener('DOMContentLoaded', function() {
         input.value = 'R$ ' + value;
       }
     }
+  });
+  
+  // Converter datas de YYYY-MM-DD para DD/MM/YYYY ao submeter
+  document.querySelector('form').addEventListener('submit', function(e) {
+    document.querySelectorAll('[data-date-field="true"]').forEach(function(input) {
+      if (input.value) {
+        const parts = input.value.split('-');
+        if (parts.length === 3) {
+          // Criar campo hidden com valor no formato brasileiro
+          const hiddenInput = document.createElement('input');
+          hiddenInput.type = 'hidden';
+          hiddenInput.name = input.name;
+          hiddenInput.value = parts[2] + '/' + parts[1] + '/' + parts[0];
+          input.form.appendChild(hiddenInput);
+          // Desabilitar o campo original para não enviar
+          input.disabled = true;
+        }
+      }
+    });
   });
 });
 </script>
