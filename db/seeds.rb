@@ -584,6 +584,14 @@ template_content = <<~HTML
         <td style="padding: 12px; border: 1px solid #ddd;">{{plan_duration}}</td>
       </tr>
       <tr>
+        <td style="padding: 12px; border: 1px solid #ddd; background-color: #f5f5f5;"><strong>Início do plano:</strong></td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{plan_start_date}}</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px; border: 1px solid #ddd; background-color: #f5f5f5;"><strong>Término do plano:</strong></td>
+        <td style="padding: 12px; border: 1px solid #ddd;">{{plan_end_date}}</td>
+      </tr>
+      <tr>
         <td style="padding: 12px; border: 1px solid #ddd; background-color: #f5f5f5;"><strong>Quantidade de Sessões:</strong></td>
         <td style="padding: 12px; border: 1px solid #ddd;"></td>
       </tr>
@@ -678,6 +686,8 @@ template.variable_fields = [
   { key: 'contractor_birthdate', label: 'Data de Nascimento', type: 'date', required: true },
   { key: 'plan_name', label: 'Nome do Plano', type: 'text', required: true, default: 'ASSESSORIA' },
   { key: 'plan_duration', label: 'Duração Aproximada', type: 'text', required: true },
+  { key: 'plan_start_date', label: 'Início do Plano', type: 'date', required: true },
+  { key: 'plan_end_date', label: 'Término do Plano (calculado automaticamente)', type: 'date', required: false },
   { key: 'sessions_call_estrategica', label: 'Sessões Call Estratégica', type: 'number', required: true },
   { key: 'sessions_individual', label: 'Sessões Consultivas Individuais', type: 'number', required: true },
   { key: 'sessions_group_consultive', label: 'Sessões Consultivas em Grupo', type: 'number', required: true },
