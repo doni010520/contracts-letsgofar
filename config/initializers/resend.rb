@@ -10,7 +10,6 @@ if ENV['RESEND_API_KEY'].present?
     user_name: 'resend',
     password: ENV['RESEND_API_KEY'],
     authentication: :plain,
-    enable_starttls_auto: true,
     ssl: true
   }
 end
