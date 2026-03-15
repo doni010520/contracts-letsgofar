@@ -1,20 +1,21 @@
 <% content_for(:title) { 'Contratos' } %>
 
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
   <h1 class="text-2xl font-bold text-gray-900">Contratos</h1>
-  <%= link_to 'Novo Contrato', new_contract_path, class: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
+  <%= link_to 'Novo Contrato', new_contract_path, class: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm' %>
 </div>
 
 <!-- Filtros -->
-<div class="mb-6 flex gap-2">
-  <%= link_to 'Todos', contracts_path, class: "px-4 py-2 rounded #{params[:status].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-  <%= link_to 'Rascunhos', contracts_path(status: 'draft'), class: "px-4 py-2 rounded #{params[:status] == 'draft' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-  <%= link_to 'Pendentes', contracts_path(status: 'pending'), class: "px-4 py-2 rounded #{params[:status] == 'pending' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-  <%= link_to 'Assinados', contracts_path(status: 'signed'), class: "px-4 py-2 rounded #{params[:status] == 'signed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-  <%= link_to 'Cancelados', contracts_path(status: 'cancelled'), class: "px-4 py-2 rounded #{params[:status] == 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+<div class="mb-6 flex flex-wrap gap-2">
+  <%= link_to 'Todos', contracts_path, class: "px-3 py-1.5 rounded text-sm #{params[:status].blank? ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Rascunhos', contracts_path(status: 'draft'), class: "px-3 py-1.5 rounded text-sm #{params[:status] == 'draft' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Pendentes', contracts_path(status: 'pending'), class: "px-3 py-1.5 rounded text-sm #{params[:status] == 'pending' ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Assinados', contracts_path(status: 'signed'), class: "px-3 py-1.5 rounded text-sm #{params[:status] == 'signed' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+  <%= link_to 'Cancelados', contracts_path(status: 'cancelled'), class: "px-3 py-1.5 rounded text-sm #{params[:status] == 'cancelled' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
 </div>
 
-<div class="bg-white shadow rounded-lg overflow-hidden">
+<!-- Desktop: Tabela -->
+<div class="hidden md:block bg-white shadow rounded-lg overflow-hidden">
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
       <tr>
@@ -72,4 +73,39 @@
       <% end %>
     </tbody>
   </table>
+</div>
+
+<!-- Mobile: Cards -->
+<div class="md:hidden space-y-3">
+  <% if @contracts.empty? %>
+    <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
+      Nenhum contrato encontrado.
+    </div>
+  <% end %>
+  <% @contracts.each do |contract| %>
+    <%
+      status_classes = {
+        'draft' => 'bg-yellow-100 text-yellow-800',
+        'pending' => 'bg-orange-100 text-orange-800',
+        'signed' => 'bg-green-100 text-green-800',
+        'cancelled' => 'bg-red-100 text-red-800'
+      }
+      status_labels = {
+        'draft' => 'Rascunho',
+        'pending' => 'Pendente',
+        'signed' => 'Assinado',
+        'cancelled' => 'Cancelado'
+      }
+    %>
+    <%= link_to contract_path(contract), class: 'block bg-white shadow rounded-lg p-4 hover:shadow-md transition-shadow' do %>
+      <div class="flex justify-between items-start mb-2">
+        <p class="font-medium text-gray-900 text-sm"><%= contract.title %></p>
+        <span class="px-2 text-xs leading-5 font-semibold rounded-full <%= status_classes[contract.status] %> ml-2 whitespace-nowrap">
+          <%= status_labels[contract.status] %>
+        </span>
+      </div>
+      <p class="text-xs text-gray-500"><%= contract.variables&.dig('contractor_name') || '-' %></p>
+      <p class="text-xs text-gray-400 mt-1"><%= contract.created_at.strftime('%d/%m/%Y %H:%M') %></p>
+    <% end %>
+  <% end %>
 </div>
