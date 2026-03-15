@@ -1,5 +1,39 @@
 <% content_for(:title) { "Editar Conteúdo: #{@contract.title}" } %>
 
+<!-- Trix Editor -->
+<link rel="stylesheet" href="https://unpkg.com/trix@2.1.8/dist/trix.css">
+<script src="https://unpkg.com/trix@2.1.8/dist/trix.umd.min.js"></script>
+
+<style>
+  trix-editor {
+    min-height: 600px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 0 0 0.5rem 0.5rem;
+  }
+  trix-toolbar {
+    border: 1px solid #d1d5db;
+    border-bottom: none;
+    border-radius: 0.5rem 0.5rem 0 0;
+    background: #f9fafb;
+    padding: 8px;
+  }
+  trix-toolbar .trix-button-group {
+    border-color: #d1d5db;
+    margin-bottom: 0;
+  }
+  trix-toolbar .trix-button {
+    border-bottom: 1px solid #d1d5db;
+  }
+  /* Esconder botão de upload de arquivo do Trix */
+  trix-toolbar .trix-button-group--file-tools {
+    display: none;
+  }
+</style>
+
 <div class="mb-6">
   <%= link_to '← Voltar', contract_path(@contract), class: 'text-blue-600 hover:text-blue-900' %>
 </div>
@@ -12,7 +46,8 @@
 
   <%= form_with model: @contract, url: update_content_contract_path(@contract), method: :patch, local: true do |f| %>
     <div class="mb-6">
-      <%= f.text_area :content_html, id: 'contract_editor', class: 'hidden' %>
+      <%= f.hidden_field :content_html, id: 'contract_content_hidden' %>
+      <trix-editor input="contract_content_hidden" class="trix-content"></trix-editor>
     </div>
 
     <div class="flex space-x-4">
@@ -25,48 +60,9 @@
   <% end %>
 </div>
 
-<!-- TinyMCE CDN -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  tinymce.init({
-    selector: '#contract_editor',
-    height: 700,
-    language: 'pt_BR',
-    plugins: [
-      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-      'insertdatetime', 'media', 'table', 'help', 'wordcount', 'pagebreak'
-    ],
-    toolbar: 'undo redo | blocks | ' +
-      'bold italic underline strikethrough | forecolor backcolor | ' +
-      'alignleft aligncenter alignright alignjustify | ' +
-      'bullist numlist outdent indent | ' +
-      'table | pagebreak | removeformat | code fullscreen | help',
-    menubar: 'file edit view insert format tools table help',
-    content_style: `
-      body { 
-        font-family: Arial, sans-serif; 
-        font-size: 14px; 
-        line-height: 1.6;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      h1 { font-size: 24px; margin-bottom: 20px; }
-      h2 { font-size: 20px; margin-top: 30px; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px; }
-      h3 { font-size: 16px; margin-top: 25px; }
-      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-      td, th { border: 1px solid #ddd; padding: 8px; }
-      p { text-align: justify; margin-bottom: 10px; }
-    `,
-    pagebreak_separator: '<div style="page-break-before: always; margin-top: 60px; border-top: 3px solid #333; padding-top: 30px;"></div>',
-    setup: function(editor) {
-      editor.on('change', function() {
-        editor.save(); // Sincroniza com o textarea
-      });
-    }
-  });
+// Desabilitar upload de arquivos no Trix
+document.addEventListener('trix-file-accept', function(e) {
+  e.preventDefault();
 });
 </script>

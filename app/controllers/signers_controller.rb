@@ -28,7 +28,7 @@ class SignersController < ApplicationController
 
   def resend_email
     if @signer.pending?
-      ContractMailer.signature_request(@signer).deliver_later
+      ContractMailer.signature_request(@signer).deliver_now
       @contract.log_activity!('resent', user: current_user, signer: @signer, ip_address: client_ip)
       flash[:notice] = "Email reenviado para #{@signer.email}."
     else

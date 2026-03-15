@@ -70,7 +70,7 @@ class Contract < ApplicationRecord
     update!(status: 'pending', sent_at: Time.current, expires_at: 30.days.from_now)
     
     contract_signers.pending.each do |signer|
-      ContractMailer.signature_request(signer).deliver_later
+      ContractMailer.signature_request(signer).deliver_now
     end
     
     log_activity!('sent', metadata: { signers_count: contract_signers.count })
@@ -169,22 +169,22 @@ class Contract < ApplicationRecord
 
   def extract_plan_dates_from_variables
     return unless variables.present?
-    
+
     # Extrair data de início
     if variables['plan_start_date'].present?
-      self.plan_start_date = Date.parse(variables['plan_start_date']) rescue nil
+      self.plan_start_date = parse_flexible_date(variables['plan_start_date'])
     end
-    
+
     # Calcular data de término automaticamente baseado no início + duração
     if plan_start_date.present? && variables['plan_duration'].present?
       calculated_end = calculate_end_date(plan_start_date, variables['plan_duration'])
       if calculated_end.present?
         self.plan_end_date = calculated_end
         formatted_date = calculated_end.strftime('%d/%m/%Y')
-        
+
         # Atualiza a variável para aparecer no contrato
         self.variables = variables.merge('plan_end_date' => formatted_date)
-        
+
         # Substitui no HTML se ainda não foi substituído
         if content_html.present? && content_html.include?('{{plan_end_date}}')
           self.content_html = content_html.gsub('{{plan_end_date}}', formatted_date)
@@ -192,8 +192,24 @@ class Contract < ApplicationRecord
       end
     elsif variables['plan_end_date'].present?
       # Fallback: usar data de término informada manualmente
-      self.plan_end_date = Date.parse(variables['plan_end_date']) rescue nil
+      self.plan_end_date = parse_flexible_date(variables['plan_end_date'])
     end
+  end
+
+  def parse_flexible_date(date_string)
+    return nil if date_string.blank?
+
+    if date_string.match?(%r{\A\d{2}/\d{2}/\d{4}\z})
+      # Formato brasileiro DD/MM/YYYY
+      Date.strptime(date_string, '%d/%m/%Y')
+    elsif date_string.match?(%r{\A\d{4}-\d{2}-\d{2}\z})
+      # Formato ISO YYYY-MM-DD
+      Date.parse(date_string)
+    else
+      Date.parse(date_string)
+    end
+  rescue Date::Error, ArgumentError
+    nil
   end
 
   def calculate_end_date(start_date, duration_text)

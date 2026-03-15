@@ -30,21 +30,78 @@
         </span>
       </div>
 
+      <!-- Stepper visual (apenas para rascunho) -->
+      <% if @contract.status == 'draft' %>
+        <div class="mt-6 mb-4">
+          <div class="flex items-center justify-between">
+            <%
+              has_content = @contract.content_html.present?
+              has_signers = @contract.contract_signers.any?
+              steps = [
+                { label: 'Dados', done: @contract.title.present? && has_content },
+                { label: 'Signatários', done: has_signers },
+                { label: 'Enviar', done: false }
+              ]
+            %>
+            <% steps.each_with_index do |step, i| %>
+              <div class="flex items-center <%= 'flex-1' unless i == steps.length - 1 %>">
+                <div class="flex items-center">
+                  <% if step[:done] %>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-green-600 text-white text-sm font-bold">&#10003;</span>
+                  <% else %>
+                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-300 text-gray-600 text-sm font-bold"><%= i + 1 %></span>
+                  <% end %>
+                  <span class="ml-2 text-sm font-medium <%= step[:done] ? 'text-green-700' : 'text-gray-500' %>"><%= step[:label] %></span>
+                </div>
+                <% unless i == steps.length - 1 %>
+                  <div class="flex-1 mx-4 h-0.5 <%= step[:done] ? 'bg-green-400' : 'bg-gray-300' %>"></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Alerta quando draft sem signatários -->
+      <% if @contract.status == 'draft' && @contract.contract_signers.empty? %>
+        <div class="mt-4 bg-amber-50 border border-amber-300 rounded-lg p-4 flex items-start space-x-3">
+          <span class="text-amber-500 text-xl mt-0.5">&#9888;</span>
+          <div>
+            <p class="font-medium text-amber-800">Nenhum signatário adicionado</p>
+            <p class="text-sm text-amber-700 mt-1">
+              Você precisa adicionar pelo menos um signatário antes de enviar o contrato.
+              <%= link_to 'Adicionar agora', edit_contract_path(@contract), class: 'underline font-semibold text-amber-900 hover:text-amber-700' %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+
       <!-- Ações -->
-      <div class="mt-6 flex flex-wrap gap-2">
+      <div class="mt-4 flex flex-wrap gap-2">
         <% if @contract.status == 'draft' %>
           <%= link_to 'Editar Dados', edit_contract_path(@contract), class: 'bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
           <%= link_to 'Editar Conteúdo', edit_content_contract_path(@contract), class: 'bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
         <% end %>
-        
-        <% if @contract.can_send? %>
-          <%= button_to 'Enviar para Assinatura', send_for_signature_contract_path(@contract), method: :post, class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium', data: { confirm: 'Enviar contrato para assinatura?' } %>
+
+        <% if @contract.status == 'draft' %>
+          <% if @contract.can_send? %>
+            <%= button_to 'Enviar para Assinatura', send_for_signature_contract_path(@contract), method: :post, class: 'bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium', data: { confirm: 'Enviar contrato para assinatura?' } %>
+          <% else %>
+            <span class="relative group">
+              <button type="button" disabled class="bg-gray-400 text-white px-4 py-2 rounded-md text-sm font-medium cursor-not-allowed opacity-70">
+                Enviar para Assinatura
+              </button>
+              <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 text-xs text-white bg-gray-800 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Adicione signatários antes de enviar
+              </span>
+            </span>
+          <% end %>
         <% end %>
-        
+
         <%= link_to 'Visualizar', preview_contract_path(@contract), target: '_blank', class: 'bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
-        
+
         <%= button_to 'Duplicar', duplicate_contract_path(@contract), method: :post, class: 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium' %>
-        
+
         <% if @contract.can_cancel? %>
           <%= button_to 'Cancelar', cancel_contract_path(@contract), method: :post, class: 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium', data: { confirm: 'Tem certeza que deseja cancelar este contrato?' } %>
         <% end %>
