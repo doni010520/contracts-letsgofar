@@ -77,17 +77,16 @@
       <% end %>
 
       <!-- Ações -->
-      <% btn_base = 'inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium transition-colors' %>
-      <% btn_outline = "#{btn_base} border" %>
-
-      <div class="mt-6 flex flex-wrap gap-2">
+      <div class="mt-6 space-y-3">
         <% if @contract.status == 'draft' %>
-          <%# Ação principal %>
+          <%# Ação principal - destaque total %>
           <% if @contract.can_send? %>
-            <%= button_to 'Enviar para Assinatura', send_for_signature_contract_path(@contract), method: :post, class: "#{btn_base} bg-green-600 hover:bg-green-700 text-white", data: { confirm: 'Enviar contrato para assinatura?' } %>
+            <%= button_to send_for_signature_contract_path(@contract), method: :post, class: 'w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg text-sm font-semibold transition-colors', data: { confirm: 'Enviar contrato para assinatura?' } do %>
+              Enviar para Assinatura
+            <% end %>
           <% else %>
-            <span class="relative group">
-              <button type="button" disabled class="<%= btn_base %> bg-gray-300 text-gray-500 cursor-not-allowed">
+            <span class="relative group block">
+              <button type="button" disabled class="w-full bg-gray-200 text-gray-400 px-4 py-3 rounded-lg text-sm font-semibold cursor-not-allowed">
                 Enviar para Assinatura
               </button>
               <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 text-xs text-white bg-gray-800 rounded-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -96,19 +95,21 @@
             </span>
           <% end %>
 
-          <%# Edição %>
-          <%= link_to 'Editar Dados', edit_contract_path(@contract), class: "#{btn_outline} border-blue-600 text-blue-600 hover:bg-blue-50" %>
-          <%= link_to 'Editar Conteúdo', edit_content_contract_path(@contract), class: "#{btn_outline} border-blue-600 text-blue-600 hover:bg-blue-50" %>
+          <%# Edição - dois botões lado a lado %>
+          <div class="grid grid-cols-2 gap-2">
+            <%= link_to 'Editar Dados', edit_contract_path(@contract), class: 'text-center border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors' %>
+            <%= link_to 'Editar Conteúdo', edit_content_contract_path(@contract), class: 'text-center border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors' %>
+          </div>
         <% end %>
 
-        <%# Utilitários %>
-        <%= link_to 'Visualizar', preview_contract_path(@contract), target: '_blank', class: "#{btn_outline} border-gray-300 text-gray-700 hover:bg-gray-50" %>
-        <%= button_to 'Duplicar', duplicate_contract_path(@contract), method: :post, class: "#{btn_outline} border-gray-300 text-gray-700 hover:bg-gray-50" %>
-
-        <%# Destrutivo %>
-        <% if @contract.can_cancel? %>
-          <%= button_to 'Cancelar', cancel_contract_path(@contract), method: :post, class: "#{btn_outline} border-red-300 text-red-600 hover:bg-red-50", data: { confirm: 'Tem certeza que deseja cancelar este contrato?' } %>
-        <% end %>
+        <%# Links secundários %>
+        <div class="flex items-center gap-4 pt-2 border-t border-gray-100">
+          <%= link_to 'Visualizar', preview_contract_path(@contract), target: '_blank', class: 'text-sm text-gray-500 hover:text-gray-700 hover:underline' %>
+          <%= button_to 'Duplicar', duplicate_contract_path(@contract), method: :post, class: 'text-sm text-gray-500 hover:text-gray-700 hover:underline bg-transparent border-0 p-0 cursor-pointer' %>
+          <% if @contract.can_cancel? %>
+            <%= button_to 'Cancelar Contrato', cancel_contract_path(@contract), method: :post, class: 'text-sm text-red-500 hover:text-red-700 hover:underline bg-transparent border-0 p-0 cursor-pointer ml-auto', data: { confirm: 'Tem certeza que deseja cancelar este contrato?' } %>
+          <% end %>
+        </div>
       </div>
     </div>
 
