@@ -187,6 +187,8 @@ class Contract < ApplicationRecord
       auto_sign: true,
       sign_order: 0
     )
+  rescue StandardError => e
+    Rails.logger.error "Erro ao adicionar signatária da empresa: #{e.message}"
   end
 
   def generate_contract_number
