@@ -250,7 +250,7 @@
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">CPF</label>
-            <%= f.text_field :cpf, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm' %>
+            <%= f.text_field :cpf, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm', 'data-mask': '000.000.000-00', placeholder: '000.000.000-00' %>
           </div>
         </div>
         <button type="submit" class="mt-3 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md text-sm font-medium">
@@ -262,16 +262,17 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initMasks() {
   // Máscaras simples (CPF, telefone, CEP)
-  document.querySelectorAll('[data-mask]').forEach(function(input) {
+  document.querySelectorAll('[data-mask]:not([data-mask-ready])').forEach(function(input) {
+    input.setAttribute('data-mask-ready', 'true');
     const mask = input.getAttribute('data-mask');
-    
+
     input.addEventListener('input', function(e) {
       let value = e.target.value.replace(/\D/g, '');
       let result = '';
       let maskIndex = 0;
-      
+
       for (let i = 0; i < value.length && maskIndex < mask.length; i++) {
         while (maskIndex < mask.length && mask[maskIndex] !== '0') {
           result += mask[maskIndex];
@@ -282,11 +283,11 @@ document.addEventListener('DOMContentLoaded', function() {
           maskIndex++;
         }
       }
-      
+
       e.target.value = result;
     });
   });
-  
+
   // Máscara de moeda (R$ 1.234,56)
   function formatCurrency(value) {
     let digits = value.replace(/\D/g, '');
@@ -297,29 +298,50 @@ document.addEventListener('DOMContentLoaded', function() {
     return 'R$ ' + parts[0] + ',' + parts[1];
   }
 
-  document.querySelectorAll('[data-type="currency"]').forEach(function(input) {
+  document.querySelectorAll('[data-type="currency"]:not([data-mask-ready])').forEach(function(input) {
+    input.setAttribute('data-mask-ready', 'true');
+
+    // Limpar campo ao focar para facilitar digitação
+    input.addEventListener('focus', function(e) {
+      if (e.target.value === 'R$ 0,00') {
+        e.target.value = '';
+      }
+    });
+
     input.addEventListener('input', function(e) {
       e.target.value = formatCurrency(e.target.value);
     });
-  });
-  
-  // Converter datas de YYYY-MM-DD para DD/MM/YYYY ao submeter
-  document.querySelector('form').addEventListener('submit', function(e) {
-    document.querySelectorAll('[data-date-field="true"]').forEach(function(input) {
-      if (input.value) {
-        const parts = input.value.split('-');
-        if (parts.length === 3) {
-          // Criar campo hidden com valor no formato brasileiro
-          const hiddenInput = document.createElement('input');
-          hiddenInput.type = 'hidden';
-          hiddenInput.name = input.name;
-          hiddenInput.value = parts[2] + '/' + parts[1] + '/' + parts[0];
-          input.form.appendChild(hiddenInput);
-          // Desabilitar o campo original para não enviar
-          input.disabled = true;
-        }
+
+    // Restaurar placeholder se sair vazio
+    input.addEventListener('blur', function(e) {
+      if (e.target.value === '') {
+        e.target.value = 'R$ 0,00';
       }
     });
   });
-});
+
+  // Converter datas de YYYY-MM-DD para DD/MM/YYYY ao submeter
+  document.querySelectorAll('form:not([data-mask-ready])').forEach(function(form) {
+    form.setAttribute('data-mask-ready', 'true');
+    form.addEventListener('submit', function(e) {
+      form.querySelectorAll('[data-date-field="true"]').forEach(function(input) {
+        if (input.value) {
+          const parts = input.value.split('-');
+          if (parts.length === 3) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = input.name;
+            hiddenInput.value = parts[2] + '/' + parts[1] + '/' + parts[0];
+            form.appendChild(hiddenInput);
+            input.disabled = true;
+          }
+        }
+      });
+    });
+  });
+}
+
+// Funciona tanto com carregamento normal quanto com Turbo
+document.addEventListener('DOMContentLoaded', initMasks);
+document.addEventListener('turbo:load', initMasks);
 </script>
