@@ -69,27 +69,32 @@
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 class="font-medium text-blue-900 mb-4">Preencher Variáveis</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <%
+              # Campos já exibidos como campos dedicados no topo
+              skip_keys = %w[plan_start_date plan_end_date]
+            %>
             <% (@contract.contract_template.variable_fields || []).each do |field| %>
-                <% 
+                <%
                   field_key = field['key'] || field[:key]
+                  next if skip_keys.include?(field_key.to_s)
                   field_label = field['label'] || field[:label]
                   field_type = field['type'] || field[:type]
                   field_required = field['required'] || field[:required]
                   current_value = @contract.variables&.dig(field_key) || ''
+
+                  # Corrigir tipos do template que estão errados no banco
+                  override_types = {
+                    'contract_date' => 'text',
+                    'installment_due_day' => 'number'
+                  }
+                  resolved_type = override_types[field_key.to_s] || field_type
                 %>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">
                     <%= field_label %>
                     <% if field_required %><span class="text-red-500">*</span><% end %>
                   </label>
-                  <%
-                    # Forçar tipo date para campos que são claramente datas
-                    effective_type = field_type
-                    if effective_type == 'text' && (field_key.to_s.include?('_date') || field_key.to_s.include?('_day'))
-                      effective_type = 'date'
-                    end
-                  %>
-                  <% case effective_type %>
+                  <% case resolved_type %>
                   <% when 'select', 'state' %>
                     <select name="contract[variables][<%= field_key %>]" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
                       <option value="">Selecione...</option>
