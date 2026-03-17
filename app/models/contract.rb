@@ -215,29 +215,17 @@ class Contract < ApplicationRecord
   def extract_plan_dates_from_variables
     return unless variables.present?
 
-    # Extrair data de início
     if variables['plan_start_date'].present?
       self.plan_start_date = parse_flexible_date(variables['plan_start_date'])
     end
 
-    # Calcular data de término automaticamente baseado no início + duração
-    if plan_start_date.present? && variables['plan_duration'].present?
-      calculated_end = calculate_end_date(plan_start_date, variables['plan_duration'])
-      if calculated_end.present?
-        self.plan_end_date = calculated_end
-        formatted_date = calculated_end.strftime('%d/%m/%Y')
-
-        # Atualiza a variável para aparecer no contrato
-        self.variables = variables.merge('plan_end_date' => formatted_date)
-
-        # Substitui no HTML se ainda não foi substituído
-        if content_html.present? && content_html.include?('{{plan_end_date}}')
-          self.content_html = content_html.gsub('{{plan_end_date}}', formatted_date)
-        end
-      end
-    elsif variables['plan_end_date'].present?
-      # Fallback: usar data de término informada manualmente
+    if variables['plan_end_date'].present?
       self.plan_end_date = parse_flexible_date(variables['plan_end_date'])
+
+      # Substitui no HTML se ainda não foi substituído
+      if plan_end_date.present? && content_html.present? && content_html.include?('{{plan_end_date}}')
+        self.content_html = content_html.gsub('{{plan_end_date}}', plan_end_date.strftime('%d/%m/%Y'))
+      end
     end
   end
 
@@ -257,26 +245,4 @@ class Contract < ApplicationRecord
     nil
   end
 
-  def calculate_end_date(start_date, duration_text)
-    # Extrai número e unidade da duração (ex: "6 meses", "12 meses", "1 ano")
-    duration_text = duration_text.to_s.downcase.strip
-    
-    if duration_text =~ /(\d+)\s*(mes|mês|meses)/i
-      months = $1.to_i
-      start_date + months.months
-    elsif duration_text =~ /(\d+)\s*(ano|anos)/i
-      years = $1.to_i
-      start_date + years.years
-    elsif duration_text =~ /(\d+)\s*(semana|semanas)/i
-      weeks = $1.to_i
-      start_date + weeks.weeks
-    else
-      # Tenta extrair apenas o número e assume meses
-      if duration_text =~ /(\d+)/
-        start_date + $1.to_i.months
-      else
-        nil
-      end
-    end
-  end
 end
