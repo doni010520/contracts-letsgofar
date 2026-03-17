@@ -25,25 +25,44 @@
         <%= f.text_field :title, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500', required: true %>
       </div>
 
-      <!-- Data de início do plano -->
-      <div>
-        <label for="contract_plan_start_date" class="block text-sm font-medium text-gray-700 mb-2">Data de Início do Plano</label>
-        <%
-          plan_date_value = ''
-          if @contract.plan_start_date.present?
-            plan_date_value = @contract.plan_start_date.strftime('%Y-%m-%d')
-          elsif @contract.variables&.dig('plan_start_date').present?
-            raw = @contract.variables['plan_start_date']
-            if raw.include?('/')
-              parts = raw.split('/')
-              plan_date_value = "#{parts[2]}-#{parts[1]}-#{parts[0]}" if parts.length == 3
-            else
-              plan_date_value = raw
+      <!-- Datas do plano -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label for="contract_plan_start_date" class="block text-sm font-medium text-gray-700 mb-2">Data de Início do Plano</label>
+          <%
+            plan_start_value = ''
+            if @contract.plan_start_date.present?
+              plan_start_value = @contract.plan_start_date.strftime('%Y-%m-%d')
+            elsif @contract.variables&.dig('plan_start_date').present?
+              raw = @contract.variables['plan_start_date']
+              if raw.include?('/')
+                parts = raw.split('/')
+                plan_start_value = "#{parts[2]}-#{parts[1]}-#{parts[0]}" if parts.length == 3
+              else
+                plan_start_value = raw
+              end
             end
-          end
-        %>
-        <%= f.date_field :plan_start_date, value: plan_date_value, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500' %>
-        <p class="mt-1 text-xs text-gray-500">A data de término será calculada automaticamente com base na duração do plano.</p>
+          %>
+          <%= f.date_field :plan_start_date, value: plan_start_value, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
+        <div>
+          <label for="contract_plan_end_date" class="block text-sm font-medium text-gray-700 mb-2">Data de Término do Plano</label>
+          <%
+            plan_end_value = ''
+            if @contract.plan_end_date.present?
+              plan_end_value = @contract.plan_end_date.strftime('%Y-%m-%d')
+            elsif @contract.variables&.dig('plan_end_date').present?
+              raw = @contract.variables['plan_end_date']
+              if raw.include?('/')
+                parts = raw.split('/')
+                plan_end_value = "#{parts[2]}-#{parts[1]}-#{parts[0]}" if parts.length == 3
+              else
+                plan_end_value = raw
+              end
+            end
+          %>
+          <%= f.date_field :plan_end_date, value: plan_end_value, class: 'block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500' %>
+        </div>
       </div>
 
       <% if @contract.contract_template.present? %>
@@ -63,7 +82,14 @@
                     <%= field_label %>
                     <% if field_required %><span class="text-red-500">*</span><% end %>
                   </label>
-                  <% case field_type %>
+                  <%
+                    # Forçar tipo date para campos que são claramente datas
+                    effective_type = field_type
+                    if effective_type == 'text' && (field_key.to_s.include?('_date') || field_key.to_s.include?('_day'))
+                      effective_type = 'date'
+                    end
+                  %>
+                  <% case effective_type %>
                   <% when 'select', 'state' %>
                     <select name="contract[variables][<%= field_key %>]" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm">
                       <option value="">Selecione...</option>
