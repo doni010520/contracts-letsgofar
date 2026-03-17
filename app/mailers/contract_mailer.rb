@@ -19,11 +19,15 @@ class ContractMailer < ApplicationMailer
 
     # Anexar PDF se o contrato já está totalmente assinado
     if @contract.status == 'signed'
-      pdf_data = @contract.generate_signed_pdf
-      attachments["#{@contract.contract_number}.pdf"] = {
-        mime_type: 'application/pdf',
-        content: pdf_data
-      }
+      begin
+        pdf_data = @contract.generate_signed_pdf
+        attachments["#{@contract.contract_number}.pdf"] = {
+          mime_type: 'application/pdf',
+          content: pdf_data
+        }
+      rescue StandardError => e
+        Rails.logger.error "Erro ao gerar PDF para confirmação: #{e.message}"
+      end
     end
 
     mail(
@@ -48,11 +52,15 @@ class ContractMailer < ApplicationMailer
     @signers = contract.contract_signers.signed
     @owner = contract.user
 
-    pdf_data = contract.generate_signed_pdf
-    attachments["#{contract.contract_number}-assinado.pdf"] = {
-      mime_type: 'application/pdf',
-      content: pdf_data
-    }
+    begin
+      pdf_data = contract.generate_signed_pdf
+      attachments["#{contract.contract_number}-assinado.pdf"] = {
+        mime_type: 'application/pdf',
+        content: pdf_data
+      }
+    rescue StandardError => e
+      Rails.logger.error "Erro ao gerar PDF para conclusão: #{e.message}"
+    end
 
     mail(
       to: @owner.email,

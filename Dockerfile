@@ -9,6 +9,7 @@ RUN apt-get update -qq && \
     npm \
     git \
     curl \
+    wkhtmltopdf \
     && rm -rf /var/lib/apt/lists/*
 
 # Diretório de trabalho

@@ -95,7 +95,11 @@ class Contract < ApplicationRecord
     elsif signers.all?(&:signed?)
       update!(status: 'signed', signed_at: Time.current)
       log_activity!('completed')
-      ContractMailer.contract_completed(self).deliver_now
+      begin
+        ContractMailer.contract_completed(self).deliver_now
+      rescue StandardError => e
+        Rails.logger.error "Erro ao enviar email de conclusão com PDF: #{e.message}"
+      end
     elsif signers.any?(&:signed?)
       update!(status: 'partially_signed')
     end
