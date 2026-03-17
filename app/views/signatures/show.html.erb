@@ -5,120 +5,152 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Assinar Contrato - <%= @contract.title %></title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Tipografia otimizada para leitura */
+    .contract-body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #1a1a1a;
+      text-align: justify;
+      hyphens: auto;
+    }
+    .contract-body h1, .contract-body h2, .contract-body h3 {
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: left;
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+    }
+    .contract-body h1 { font-size: 1.5em; }
+    .contract-body h2 { font-size: 1.25em; border-bottom: 1px solid #d1d5db; padding-bottom: 0.3em; }
+    .contract-body h3 { font-size: 1.1em; }
+    .contract-body p { margin-bottom: 0.8em; }
+    .contract-body table { width: 100%; border-collapse: collapse; margin: 1em 0; }
+    .contract-body td, .contract-body th { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; }
+    .contract-body th { background: #f9fafb; font-weight: 600; }
+    .contract-body ul, .contract-body ol { margin: 0.5em 0; padding-left: 1.5em; }
+    .contract-body li { margin-bottom: 0.3em; }
+
+    @media (max-width: 640px) {
+      .contract-body { font-size: 15px; line-height: 1.7; }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <div class="max-w-4xl mx-auto py-8 px-4">
-    <!-- Cabeçalho -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-blue-900">Let's Go Far</h1>
-      <p class="text-gray-600">Assessoria Consultiva de Inglês</p>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Top bar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-semibold text-gray-900">Let's Go Far</p>
+        <p class="text-xs text-gray-500">Assessoria Consultiva de Inglês</p>
+      </div>
+      <span class="px-3 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+        Aguardando assinatura
+      </span>
     </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-6 sm:py-10">
 
     <% if flash[:alert] %>
-      <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
         <%= flash[:alert] %>
       </div>
     <% end %>
 
-    <!-- Informações do contrato -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <h2 class="text-xl font-semibold text-gray-900"><%= @contract.title %></h2>
-          <p class="text-gray-500"><%= @contract.contract_number %></p>
-        </div>
-        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-          Aguardando sua assinatura
-        </span>
-      </div>
-      
-      <p class="text-gray-600 mb-2">
-        Olá, <strong><%= @signer.name %></strong>! Você foi convidado(a) a assinar este contrato.
+    <!-- Greeting -->
+    <div class="mb-6">
+      <p class="text-gray-700">
+        Olá, <strong><%= @signer.name %></strong>. Leia o contrato abaixo e, se estiver de acordo, assine no final da página.
       </p>
-      
       <% if @contract.expires_at %>
-        <p class="text-sm text-gray-500">
-          ⏰ Este convite expira em <%= @contract.expires_at.strftime('%d/%m/%Y') %>
+        <p class="text-sm text-gray-500 mt-1">
+          Válido até <%= @contract.expires_at.strftime('%d/%m/%Y') %>
         </p>
       <% end %>
     </div>
 
-    <!-- Conteúdo do contrato -->
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Conteúdo do Contrato</h3>
-      <div class="prose max-w-none border rounded-lg p-6 bg-gray-50 max-h-96 overflow-y-auto">
+    <!-- Contract document -->
+    <article class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+      <!-- Document header -->
+      <div class="px-6 sm:px-10 pt-8 pb-4 border-b border-gray-100">
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900"><%= @contract.title %></h1>
+        <p class="text-sm text-gray-500 mt-1"><%= @contract.contract_number %></p>
+      </div>
+
+      <!-- Document body -->
+      <div class="px-6 sm:px-10 py-8 contract-body">
         <%= raw @contract.content_html %>
       </div>
-    </div>
+    </article>
 
-    <!-- Formulário de assinatura -->
-    <div class="bg-white shadow rounded-lg p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Assinar Contrato</h3>
-      
-      <%= form_tag public_sign_path(@signer.sign_token), method: :post, class: 'space-y-4', id: 'sign-form' do %>
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <p class="text-sm text-blue-800">
-            <strong>Importante:</strong> Ao assinar este contrato, você declara que leu e concorda com todos os termos acima.
-            A assinatura eletrônica tem validade jurídica conforme a Medida Provisória 2.200-2/2001.
-          </p>
-        </div>
+    <!-- Signature form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 mb-8" id="assinatura">
+      <h2 class="text-lg font-semibold text-gray-900 mb-1">Assinar contrato</h2>
+      <p class="text-sm text-gray-500 mb-6">
+        Sua assinatura eletrônica tem validade jurídica (MP 2.200-2/2001).
+      </p>
 
+      <%= form_tag public_sign_path(@signer.sign_token), method: :post, class: 'space-y-5', id: 'sign-form' do %>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Digite seu nome completo para confirmar *
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Nome completo <span class="text-red-500">*</span>
           </label>
           <input type="text" name="confirmation_name" required
                  placeholder="<%= @signer.name %>"
-                 class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm text-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                 class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
         </div>
 
         <% if @signer.cpf.present? %>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Confirme seu CPF *
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              CPF <span class="text-red-500">*</span>
             </label>
             <input type="text" name="confirmation_cpf" required
                    placeholder="000.000.000-00"
-                   class="block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm text-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
           </div>
         <% end %>
 
-        <div class="flex items-start">
-          <input type="checkbox" id="agree" required class="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded">
-          <label for="agree" class="ml-2 text-sm text-gray-700">
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input type="checkbox" id="agree" required class="mt-1 h-5 w-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
+          <span class="text-sm text-gray-700 leading-snug">
             Declaro que li e concordo com todos os termos e condições deste contrato.
-          </label>
-        </div>
+          </span>
+        </label>
 
-        <div class="flex space-x-4 pt-4">
-          <button type="submit" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium text-lg">
-            ✓ Assinar Contrato
-          </button>
-        </div>
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-base transition-colors">
+          Assinar Contrato
+        </button>
       <% end %>
 
-      <div class="mt-6 pt-6 border-t">
-        <p class="text-sm text-gray-500 mb-3">Não concorda com os termos?</p>
-        <%= form_tag refuse_contract_path(@signer.sign_token, format: nil).gsub('/sign/', '/sign/').gsub('/refuse', '/refuse'), method: :post, class: 'space-y-3' do %>
-          <input type="hidden" name="_method" value="post">
-          <textarea name="reason" rows="2" placeholder="Motivo da recusa (opcional)"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm"></textarea>
-          <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-md text-sm font-medium"
-                  onclick="return confirm('Tem certeza que deseja recusar este contrato?')">
-            Recusar Contrato
-          </button>
-        <% end %>
-      </div>
+      <!-- Refuse -->
+      <details class="mt-6 pt-6 border-t border-gray-100">
+        <summary class="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+          Não concorda com os termos?
+        </summary>
+        <div class="mt-3">
+          <%= form_tag refuse_contract_path(@signer.sign_token, format: nil).gsub('/sign/', '/sign/').gsub('/refuse', '/refuse'), method: :post, class: 'space-y-3' do %>
+            <input type="hidden" name="_method" value="post">
+            <textarea name="reason" rows="2" placeholder="Motivo da recusa (opcional)"
+                      class="block w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400"></textarea>
+            <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-medium"
+                    onclick="return confirm('Tem certeza que deseja recusar este contrato?')">
+              Recusar contrato
+            </button>
+          <% end %>
+        </div>
+      </details>
     </div>
 
     <!-- Footer -->
-    <div class="text-center mt-8 text-sm text-gray-500">
-      <p>Let's Go Far Ensino de Idiomas LTDA • CNPJ: 53.654.906/0001-96</p>
-    </div>
-  </div>
+    <footer class="text-center text-xs text-gray-400 pb-8">
+      <p>Let's Go Far Ensino de Idiomas LTDA &middot; CNPJ: 53.654.906/0001-96</p>
+    </footer>
+  </main>
 
   <script>
-    // Capturar fingerprint básico
     document.getElementById('sign-form').addEventListener('submit', function(e) {
       const fingerprint = btoa(navigator.userAgent + screen.width + screen.height + new Date().getTimezoneOffset());
       const input = document.createElement('input');
