@@ -21,7 +21,7 @@ class ContractMailer < ApplicationMailer
     if @contract.status == 'signed'
       begin
         pdf_data = @contract.generate_signed_pdf
-        attachments["#{@contract.contract_number}.pdf"] = {
+        attachments[pdf_filename(@contract, @signer.name)] = {
           mime_type: 'application/pdf',
           content: pdf_data
         }
@@ -52,9 +52,12 @@ class ContractMailer < ApplicationMailer
     @signers = contract.contract_signers.signed
     @owner = contract.user
 
+    # Nome do aluno (primeiro signatário manual)
+    student = contract.contract_signers.where(auto_sign: false).first
+
     begin
       pdf_data = contract.generate_signed_pdf
-      attachments["#{contract.contract_number}-assinado.pdf"] = {
+      attachments[pdf_filename(contract, student&.name)] = {
         mime_type: 'application/pdf',
         content: pdf_data
       }
@@ -70,5 +73,13 @@ class ContractMailer < ApplicationMailer
       to: recipients,
       subject: "Todas as assinaturas concluidas: #{@contract.title}"
     )
+  end
+
+  private
+
+  def pdf_filename(contract, signer_name = nil)
+    parts = [contract.contract_number, contract.title.parameterize]
+    parts << signer_name.parameterize if signer_name.present?
+    "#{parts.join('-')}.pdf"
   end
 end
