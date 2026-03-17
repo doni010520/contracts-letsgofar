@@ -52,9 +52,11 @@ class ContractSigner < ApplicationRecord
       )
       
       contract.update_signature_status!
-      
-      # Enviar confirmação
-      ContractMailer.signature_confirmation(self).deliver_now
+
+      # Enviar confirmação (exceto para assinaturas automáticas)
+      unless auto_sign?
+        ContractMailer.signature_confirmation(self).deliver_now
+      end
     end
 
     true

@@ -62,8 +62,12 @@ class ContractMailer < ApplicationMailer
       Rails.logger.error "Erro ao gerar PDF para conclusão: #{e.message}"
     end
 
+    # Enviar para o dono do contrato + signatários auto_sign (empresa)
+    company_emails = contract.contract_signers.where(auto_sign: true).pluck(:email)
+    recipients = ([@owner.email] + company_emails).uniq
+
     mail(
-      to: @owner.email,
+      to: recipients,
       subject: "Todas as assinaturas concluidas: #{@contract.title}"
     )
   end
