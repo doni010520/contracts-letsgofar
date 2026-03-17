@@ -76,8 +76,14 @@ class Contract < ApplicationRecord
 
     update!(status: 'pending', sent_at: Time.current, expires_at: 30.days.from_now)
 
-    contract_signers.pending.each do |signer|
-      if signer.auto_sign?
+    # Primeiro envia emails para signatários manuais
+    contract_signers.pending.where(auto_sign: false).each do |signer|
+      ContractMailer.signature_request(signer).deliver_now
+    end
+
+    # Depois auto-assina os signatários automáticos
+    contract_signers.pending.where(auto_sign: true).each do |signer|
+      begin
         signer.sign!({
           ip_address: '127.0.0.1',
           user_agent: 'AutoSign/1.0 (Let\'s Go Far)',
@@ -86,8 +92,8 @@ class Contract < ApplicationRecord
           confirmation_name: signer.name,
           confirmation_cpf: signer.cpf
         })
-      else
-        ContractMailer.signature_request(signer).deliver_now
+      rescue StandardError => e
+        Rails.logger.error "Erro no auto-sign de #{signer.name}: #{e.message}"
       end
     end
 
