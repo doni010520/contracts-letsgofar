@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class SignaturesController < ApplicationController
+  layout false
   skip_before_action :verify_authenticity_token, only: [:create, :refuse]
   
   before_action :set_signer
