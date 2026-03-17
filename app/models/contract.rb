@@ -95,9 +95,20 @@ class Contract < ApplicationRecord
     elsif signers.all?(&:signed?)
       update!(status: 'signed', signed_at: Time.current)
       log_activity!('completed')
+      ContractMailer.contract_completed(self).deliver_now
     elsif signers.any?(&:signed?)
       update!(status: 'partially_signed')
     end
+  end
+
+  def generate_signed_pdf
+    html = ApplicationController.render(
+      template: 'contracts/preview',
+      layout: 'pdf',
+      assigns: { contract: self }
+    )
+
+    WickedPdf.new.pdf_from_string(html, encoding: 'UTF-8')
   end
 
   def check_expiration!
