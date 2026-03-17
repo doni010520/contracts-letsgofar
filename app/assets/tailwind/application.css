@@ -1,1 +1,6 @@
  @import "tailwindcss";
+
+/* Hide Turbo progress bar */
+.turbo-progress-bar {
+  display: none;
+}
