@@ -94,24 +94,51 @@
                            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                            data-date-field="true"
                            <%= 'required' if field_required %>>
+                  <% when 'currency' %>
+                    <%
+                      # Formatar valor salvo para exibição
+                      currency_display = ''
+                      if current_value.present?
+                        raw_val = current_value.to_s.gsub(/[^\d,.]/, '')
+                        # Se já tem vírgula (formato BR), usar direto
+                        if raw_val.include?(',')
+                          currency_display = "R$ #{raw_val}"
+                        elsif raw_val.include?('.')
+                          # Formato com ponto decimal -> trocar para vírgula
+                          currency_display = "R$ #{raw_val.gsub('.', ',')}"
+                        else
+                          # Número inteiro
+                          currency_display = "R$ #{raw_val},00"
+                        end
+                      end
+                    %>
+                    <input type="text"
+                           name="contract[variables][<%= field_key %>]"
+                           value="<%= currency_display %>"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                           data-type="currency"
+                           placeholder="R$ 0,00"
+                           <%= 'required' if field_required %>>
+                  <% when 'number' %>
+                    <input type="number"
+                           name="contract[variables][<%= field_key %>]"
+                           value="<%= current_value %>"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                           <%= 'required' if field_required %>>
                   <% else %>
-                    <% 
+                    <%
                       data_mask = case field_type
                         when 'cpf' then '000.000.000-00'
                         when 'phone' then '(00) 00000-0000'
                         when 'cep' then '00000-000'
-                        when 'currency' then nil
                         else nil
                       end
-                      input_class = "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      input_class += " mask-currency" if field_type == 'currency'
                     %>
-                    <input type="text" 
-                           name="contract[variables][<%= field_key %>]" 
+                    <input type="text"
+                           name="contract[variables][<%= field_key %>]"
                            value="<%= current_value %>"
-                           class="<%= input_class %>"
+                           class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                            <% if data_mask %>data-mask="<%= data_mask %>"<% end %>
-                           <% if field_type == 'currency' %>data-type="currency"<% end %>
                            <%= 'required' if field_required %>>
                   <% end %>
                 </div>
@@ -223,30 +250,19 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Máscara de moeda (R$ 1.234,56)
+  function formatCurrency(value) {
+    let digits = value.replace(/\D/g, '');
+    if (digits === '') return '';
+    let num = (parseInt(digits) / 100).toFixed(2);
+    let parts = num.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return 'R$ ' + parts[0] + ',' + parts[1];
+  }
+
   document.querySelectorAll('[data-type="currency"]').forEach(function(input) {
     input.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value === '') {
-        e.target.value = '';
-        return;
-      }
-      
-      value = (parseInt(value) / 100).toFixed(2);
-      value = value.replace('.', ',');
-      value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-      e.target.value = 'R$ ' + value;
+      e.target.value = formatCurrency(e.target.value);
     });
-    
-    // Formatar valor inicial se existir
-    if (input.value && !input.value.startsWith('R$')) {
-      let value = input.value.replace(/\D/g, '');
-      if (value) {
-        value = (parseInt(value) / 100).toFixed(2);
-        value = value.replace('.', ',');
-        value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        input.value = 'R$ ' + value;
-      }
-    }
   });
   
   // Converter datas de YYYY-MM-DD para DD/MM/YYYY ao submeter

@@ -695,7 +695,7 @@ template.variable_fields = [
   { key: 'plan_value', label: 'Valor Total do Plano', type: 'currency', required: true },
   { key: 'installments_count', label: 'Número de Parcelas', type: 'number', required: true },
   { key: 'first_installment_value', label: 'Valor 1ª Parcela (Matrícula)', type: 'currency', required: true },
-  { key: 'installment_due_day', label: 'Dia de Vencimento das Parcelas', type: 'number', required: true },
+  { key: 'installment_due_day', label: 'Dia de Vencimento das Parcelas', type: 'date', required: true },
   { key: 'contract_date', label: 'Data do Contrato', type: 'date', required: true }
 ]
 template.save!
