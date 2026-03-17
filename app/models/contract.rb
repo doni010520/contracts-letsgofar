@@ -13,6 +13,13 @@ class Contract < ApplicationRecord
   before_validation :generate_contract_number, on: :create
   before_save :generate_document_hash, if: :content_html_changed?
   before_save :extract_plan_dates_from_variables
+  after_create :add_company_signer
+
+  COMPANY_SIGNER = {
+    name: 'Ianka Cavalcante',
+    email: 'letsgofaridioma@gmail.com',
+    role: 'company'
+  }.freeze
 
   scope :draft, -> { where(status: 'draft') }
   scope :pending, -> { where(status: 'pending') }
@@ -57,7 +64,7 @@ class Contract < ApplicationRecord
   end
 
   def can_send?
-    status == 'draft' && contract_signers.any?
+    status == 'draft' && contract_signers.where(auto_sign: false).any?
   end
 
   def can_cancel?
@@ -68,11 +75,22 @@ class Contract < ApplicationRecord
     return false unless can_send?
 
     update!(status: 'pending', sent_at: Time.current, expires_at: 30.days.from_now)
-    
+
     contract_signers.pending.each do |signer|
-      ContractMailer.signature_request(signer).deliver_now
+      if signer.auto_sign?
+        signer.sign!({
+          ip_address: '127.0.0.1',
+          user_agent: 'AutoSign/1.0 (Let\'s Go Far)',
+          geolocation: {},
+          browser_fingerprint: 'auto_sign',
+          confirmation_name: signer.name,
+          confirmation_cpf: signer.cpf
+        })
+      else
+        ContractMailer.signature_request(signer).deliver_now
+      end
     end
-    
+
     log_activity!('sent', metadata: { signers_count: contract_signers.count })
     true
   end
@@ -132,7 +150,7 @@ class Contract < ApplicationRecord
     new_contract.expires_at = nil
     new_contract.save!
     
-    contract_signers.each do |signer|
+    contract_signers.where(auto_sign: false).each do |signer|
       new_contract.contract_signers.create!(
         name: signer.name,
         email: signer.email,
@@ -160,6 +178,16 @@ class Contract < ApplicationRecord
   end
 
   private
+
+  def add_company_signer
+    contract_signers.create!(
+      name: COMPANY_SIGNER[:name],
+      email: COMPANY_SIGNER[:email],
+      role: COMPANY_SIGNER[:role],
+      auto_sign: true,
+      sign_order: 0
+    )
+  end
 
   def generate_contract_number
     return if contract_number.present?
